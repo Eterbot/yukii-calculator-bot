@@ -63,10 +63,11 @@ async def calculate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         formatted_result = format_number(result)
         text = f"{expr} = {formatted_result}"
         
-        from telegram import CopyTextButton
+        # Since CopyTextButton is not available in this version, 
+        # we'll use a callback button to send the result as a message.
         keyboard = [
             [
-                InlineKeyboardButton("📋 Copy", copy_text=CopyTextButton(text=str(result))),
+                InlineKeyboardButton("📋 Copy", callback_data=f"copy_{result}"),
                 InlineKeyboardButton("❌ Delete", callback_data="delete")
             ]
         ]
