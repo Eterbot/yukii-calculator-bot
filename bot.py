@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
@@ -10,7 +11,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-TOKEN = os.getenv("TELEGRAM_TOKEN", "8632838449:AAGBW4zv7z895WPZKsY1ITVCQfcvTQSqKp8")
+TOKEN = os.getenv("BOT_TOKEN", "8632838449:AAGBW4zv7z895WPZKsY1ITVCQfcvTQSqKp8")
 
 def format_number(number):
     """Formats a number with thousand separators."""
@@ -52,12 +53,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def calculate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     expr = update.message.text.strip()
     
-    # Check if it's a math expression
-    if not any(char in expr for char in "+-*/^()"):
-        # If it's just numbers with spaces, it might not be an expression
-        # but the original bot seems to handle it or ignore it.
-        # Let's try to evaluate it anyway if it looks like math.
-        pass
+    # Check if it looks like a math expression
+    if not any(char in expr for char in "0123456789"):
+        return
 
     result = safe_eval(expr)
     
@@ -82,22 +80,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "delete":
         await query.message.delete()
     elif query.data.startswith("copy_"):
-        # Telegram doesn't have a direct "copy to clipboard" button action
-        # but we can send a message that the user can easily copy or just inform them.
-        # Usually, bots just provide the text for the user to tap and copy.
         result_val = query.data.split("_")[1]
-        await query.answer(f"Result: {result_val}\n(Tap to copy manually if your client supports it)", show_alert=True)
+        await query.answer(f"Result: {result_val}", show_alert=True)
 
-if __name__ == '__main__':
-    import asyncio
-    
-    # Fix for RuntimeError: There is no current event loop in thread 'MainThread'
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
+async def main():
     application = ApplicationBuilder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
@@ -105,4 +91,16 @@ if __name__ == '__main__':
     application.add_handler(CallbackQueryHandler(button_handler))
     
     print("Bot is running...")
-    application.run_polling()
+    async with application:
+        await application.initialize()
+        await application.start()
+        await application.updater.start_polling()
+        # Run until the program is stopped
+        while True:
+            await asyncio.sleep(1)
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
