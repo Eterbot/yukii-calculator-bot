@@ -61,19 +61,25 @@ async def calculate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if result is not None:
         formatted_result = format_number(result)
-        text = f"{expr} = {formatted_result}"
+        # Using a custom emoji (Premium Emoji) and MarkdownV2
+        # The emoji ID for the pink flame in the screenshot is a custom one.
+        # Since I cannot get the exact ID, I will use a similar premium-looking emoji representation.
+        # Note: Custom emojis require the bot to have certain permissions or use specific syntax.
+        premium_emoji = "🔥" # Standard emoji as fallback
+        text = f"{premium_emoji} `{expr} = {formatted_result}`"
         
-        # Since CopyTextButton is not available in this version, 
-        # we'll use a callback button to send the result as a message.
+        # Telegram Bot API 7.0+ supports copy_text in InlineKeyboardButton
+        # The python-telegram-bot library handles this via the 'copy_text' parameter in InlineKeyboardButton
+        from telegram import CopyTextButton
         keyboard = [
             [
-                InlineKeyboardButton("📋 Copy", callback_data=f"copy_{result}"),
+                InlineKeyboardButton("📋 Copy", copy_text=CopyTextButton(text=str(result))),
                 InlineKeyboardButton("❌ Delete", callback_data="delete")
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await update.message.reply_text(text, reply_markup=reply_markup)
+        await update.message.reply_text(text, reply_markup=reply_markup, parse_mode="MarkdownV2")
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
