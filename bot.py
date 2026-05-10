@@ -37,7 +37,7 @@ def safe_eval(expr):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = (
-        "🎉 Welcome to Yukii Calculator Bot!\n\n"
+        "🎉 Welcome to Calculator Bot!\n\n"
         "✅ You can now use all calculator commands in DM.\n"
         "📌 Supported operations:\n"
         "➕ Addition (+)\n"
