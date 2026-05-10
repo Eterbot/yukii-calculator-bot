@@ -81,7 +81,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.message.delete()
     elif query.data.startswith("copy_"):
         result_val = query.data.split("_")[1]
-        await query.answer(f"Result: {result_val}", show_alert=True)
+        # Send the result as a new message so the user can easily copy it
+        await context.bot.send_message(chat_id=query.message.chat_id, text=result_val)
+        await query.answer("Result sent! You can now copy it.")
 
 async def main():
     application = ApplicationBuilder().token(TOKEN).build()
