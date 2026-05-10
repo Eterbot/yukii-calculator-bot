@@ -89,6 +89,15 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer(f"Result: {result_val}\n(Tap to copy manually if your client supports it)", show_alert=True)
 
 if __name__ == '__main__':
+    import asyncio
+    
+    # Fix for RuntimeError: There is no current event loop in thread 'MainThread'
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
     application = ApplicationBuilder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
