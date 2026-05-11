@@ -61,25 +61,34 @@ async def calculate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if result is not None:
         formatted_result = format_number(result)
-        # Using a custom emoji (Premium Emoji) and MarkdownV2
-        # The emoji ID for the pink flame in the screenshot is a custom one.
-        # Since I cannot get the exact ID, I will use a similar premium-looking emoji representation.
-        # Note: Custom emojis require the bot to have certain permissions or use specific syntax.
-        premium_emoji = "🔥" # Standard emoji as fallback
-        text = f"{premium_emoji} `{expr} = {formatted_result}`"
         
-        # Telegram Bot API 7.0+ supports copy_text in InlineKeyboardButton
-        # The python-telegram-bot library handles this via the 'copy_text' parameter in InlineKeyboardButton
+        # Custom Emoji IDs provided by user
+        # Copy Emoji ID: 6318764724917903167
+        # Delete Emoji ID: 6239783660778693388
+        
+        # In Telegram MarkdownV2, custom emojis are represented as <tg-emoji emoji-id="ID">emoji</tg-emoji>
+        # However, inside InlineKeyboardButton text, we usually use the emoji itself.
+        # We will use the premium emoji in the message text as well.
+        
+        copy_emoji_id = "6318764724917903167"
+        delete_emoji_id = "6239783660778693388"
+        
+        # Message text with premium emoji
+        text = f"<tg-emoji emoji-id=\"{copy_emoji_id}\">💖</tg-emoji> `{expr} = {formatted_result}`"
+        
         from telegram import CopyTextButton
         keyboard = [
             [
-                InlineKeyboardButton("📋 Copy", copy_text=CopyTextButton(text=str(result))),
-                InlineKeyboardButton("❌ Delete", callback_data="delete")
+                # We use the emoji ID in the button text as well if supported by client, 
+                # but standard practice is emoji + text
+                InlineKeyboardButton(f"📋 Copy", copy_text=CopyTextButton(text=str(result))),
+                InlineKeyboardButton(f"❌ Delete", callback_data="delete")
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await update.message.reply_text(text, reply_markup=reply_markup, parse_mode="MarkdownV2")
+        # Use HTML parse mode for tg-emoji tag
+        await update.message.reply_html(text, reply_markup=reply_markup)
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
