@@ -1,4 +1,4 @@
-# Yukii Calculator Bot
+# i Calculator Bot
 
 A simple Telegram calculator bot inspired by @Yukii_calculator_bot.
 
