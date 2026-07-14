@@ -1,6 +1,6 @@
 # i Calculator Bot
 
-A simple Telegram calculator bot inspired by @Yukii_calculator_bot.
+A simple Telegram calculator bot inspired by @i_calculator_bot.
 
 ## Features
 - Basic arithmetic operations: +, -, *, /
